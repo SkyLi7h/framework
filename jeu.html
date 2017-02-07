@@ -18,26 +18,31 @@
   </head>
   <body>
 	<div id="scoreDiv" style="position: absolute; left: 5px; margin-top: -10px;"><h2><div id="point">0</div></h2></div>
+	<div id="difficulte" style="position: absolute; right:10px; top: 5px;">Niveau : <div id="niveau">1</div></div>
     <canvas id="myCanvas"></canvas>
     <script>
 	  var canvas = document.getElementById('myCanvas');
       var context = canvas.getContext('2d');
 	  var lastTime = new Date().getTime();
+	  var lastTimeModifVitesse = lastTime
 	  var larg = (document.body.clientWidth);
 	  var hauteur = (document.body.clientHeight);
 	  canvas.width = larg;
 	  canvas.height = hauteur;
 	  var rec = [];
-	  var longMin = 10;
-	  var longMax = 100;
-	  var hautMin = 10;
-	  var hautMax = 100;
-	  var vitesseMin = 1;
-	  var vitesseMax = 8;
-	  var recSeconde = 3;
+	  var longMin;
+	  var longMax;
+	  var hautMin;
+	  var hautMax;
+	  var vitesseMin;
+	  var vitesseMax;
+	  var recSeconde;
 	  var nbRec = 0;
-	  var nbMaxRec = 30;
-	  var difficulte = 5000;
+	  var nbMaxRec;
+	  var tempsApparition;
+	  
+	  
+	  var difficulte = 2;
 	  
 	  var haut = false;
 	  var bas = false;
@@ -47,6 +52,45 @@
 	  var points = 0
 	  
 	  var pause = false;
+	  
+	  document.getElementById("niveau").innerHTML = difficulte;
+	  
+	  if(difficulte == 1)
+	  {
+		longMin = 15;
+		longMax = 100;
+		hautMin = 15;
+		hautMax = 100;
+		vitesseMin = 1;
+		vitesseMax = 8;
+		recSeconde = 3;
+		nbMaxRec = 30;
+		tempsApparition = 7000;
+	  }
+	  if(difficulte == 2)
+	  {
+		longMin = 10;
+		longMax = 150;
+		hautMin = 10;
+		hautMax = 150;
+		vitesseMin = 2;
+		vitesseMax = 10;
+		recSeconde = 4;
+		nbMaxRec = 45;
+		tempsApparition = 5000;
+	  }
+	  if(difficulte == 3)
+	  {
+		longMin = 5;
+		longMax = 200;
+		hautMin = 5;
+		hautMax = 200;
+		vitesseMin = 2;
+		vitesseMax = 13;
+		recSeconde = 5;
+		nbMaxRec = 60;
+		tempsApparition = 3000;
+	  }
 
 	  
 	  
@@ -115,10 +159,15 @@
 			}		
 		}
 		
+		
+
+		
 		function score(){
 			points++;
 			document.getElementById("point").innerHTML = points;
-			setTimeout('score()',1000); /* rappel après 2 secondes = 2000 millisecondes */
+			
+			if(!pause)
+				setTimeout('score()',1000); /* rappel après 2 secondes = 2000 millisecondes */
 		}
 		
 		function colision(moi, rec)
@@ -139,7 +188,7 @@
 
 		var now = new Date().getTime();
 	
-		if(lastTime + difficulte < now && nbRec != nbMaxRec)
+		if(lastTime + tempsApparition < now && nbRec != nbMaxRec)
 		{
 			genRect()
 			lastTime = now;
@@ -153,10 +202,20 @@
 			if(colision(moi, rec[i]))
 				pause = true;
 				
-				
+			
+			
 			rec[i].y += rec[i].vitesse;
 			drawRectangle(rec[i], context, '#8ED6FF');
-			verifRectangle(rec[i], i);		
+			verifRectangle(rec[i], i);					
+		}
+		
+		if(lastTimeModifVitesse + 1000 < now && difficulte == 3)
+		{
+			lastTimeModifVitesse = now;
+			for(i=0; i<rec.length; i++)
+			{
+				rec[i].vitesse = aleatoire(vitesseMin, vitesseMax);
+			}
 		}
 		
 		deplacement();
