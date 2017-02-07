@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+		padding: 0;
+		height: 100%;
+		overflow:hidden;
+      }
+	  
+	  html {
+        margin: 0;
+		padding: 0;
+		height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+	<div id="scoreDiv" style="position: absolute; left: 5px; margin-top: -10px;"><h2><div id="point">0</div></h2></div>
+    <canvas id="myCanvas"></canvas>
+    <script>
+	  var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+	  var lastTime = new Date().getTime();
+	  var larg = (document.body.clientWidth);
+	  var hauteur = (document.body.clientHeight);
+	  canvas.width = larg;
+	  canvas.height = hauteur;
+	  var rec = [];
+	  var longMin = 10;
+	  var longMax = 100;
+	  var hautMin = 10;
+	  var hautMax = 100;
+	  var vitesseMin = 1;
+	  var vitesseMax = 8;
+	  var recSeconde = 3;
+	  var nbRec = 0;
+	  var nbMaxRec = 30;
+	  var difficulte = 5000;
+	  
+	  var haut = false;
+	  var bas = false;
+	  var gauche = false;
+	  var droite = false;
+	  
+	  var points = 0
+	  
+	  var pause = false;
+
+	  
+	  
+	  var moi = new Rectangle(30, 30, (larg/2)-15, hauteur-100, 6);
+	  
+	  window.onkeydown = function (event){
+ 
+			if(event.keyCode == 38)
+			{
+				haut = true;
+			}
+			if(event.keyCode == 40)
+			{
+				bas = true;
+			}
+			if(event.keyCode == 39)
+			{
+				droite = true;
+			}
+			if(event.keyCode == 37)
+			{
+				gauche = true;
+			}								 
+		}
+		
+		window.onkeyup = function (event){
+ 
+			if(event.keyCode == 38)
+			{
+				haut = false;
+			}
+			if(event.keyCode == 40)
+			{
+				bas = false;
+			}
+			if(event.keyCode == 39)
+			{
+				droite = false;
+			}
+			if(event.keyCode == 37)
+			{
+				gauche = false;
+			}								 
+		}
+		
+		function deplacement()
+		{
+			if(haut)
+			{
+				moi.y = moi.y - moi.vitesse;
+			}
+			
+			if(bas)
+			{
+				moi.y = moi.y + moi.vitesse;
+			}			
+				
+			if(droite)
+			{
+				moi.x = moi.x + moi.vitesse;
+			}				
+				
+			if(gauche)
+			{
+				moi.x = moi.x - moi.vitesse;
+			}		
+		}
+		
+		function score(){
+			points++;
+			document.getElementById("point").innerHTML = points;
+			setTimeout('score()',1000); /* rappel après 2 secondes = 2000 millisecondes */
+		}
+		
+		function colision(moi, rec)
+		{		
+			if((moi.x >= rec.x + rec.largeur)      // trop à droite
+				|| (moi.x + moi.largeur <= rec.x) // trop à gauche
+				|| (moi.y >= rec.y + rec.hauteur) // trop en bas
+				|| (moi.y + moi.hauteur <= rec.y))  // trop en haut
+					  return false; 
+			   else
+					  return true;
+		
+		}
+		
+		
+	  
+	  function animate(canvas, context, startTime) {
+
+		var now = new Date().getTime();
+	
+		if(lastTime + difficulte < now && nbRec != nbMaxRec)
+		{
+			genRect()
+			lastTime = now;
+		}
+	  
+	     // clear
+        context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		for(i=0; i<rec.length; i++)
+		{
+			if(colision(moi, rec[i]))
+				pause = true;
+				
+				
+			rec[i].y += rec[i].vitesse;
+			drawRectangle(rec[i], context, '#8ED6FF');
+			verifRectangle(rec[i], i);		
+		}
+		
+		deplacement();
+		drawRectangle(moi, context, '#808080');
+		
+
+		if(!pause)
+		{
+			// request new frame
+			requestAnimFrame(function() {
+			  animate(canvas, context);
+			});
+		}
+        
+      }
+	  
+	  function verifRectangle(rec, i)
+	  {
+		if((rec.y - rec.hauteur) > hauteur)
+		{
+			regenRec(rec, i);
+		}
+	  
+	  }
+	  
+	  function regenRec(rec, i)
+	  {
+		var x = aleatoire(0, larg);
+		var vitesse = aleatoire(vitesseMin, vitesseMax);
+		var l = aleatoire(longMin, longMax);
+		var h = aleatoire(hautMin, hautMax);
+		
+		rec.x = x;
+		rec.y = 0 - h;
+		rec.vitesse = vitesse;
+		rec.largeur = l;
+		rec.hauteur = h;
+	  }
+
+	  function Rectangle(l, h, x, y, vitesse)
+	  {
+		this.largeur = l;
+		this.hauteur = h;
+		this.x = x;
+		this.y = y;
+		this.vitesse = vitesse;	  
+	  }
+	  
+	  function genRect()
+	  {
+		for (var i=0; i<recSeconde; i++)
+		  {
+		  
+				var x = aleatoire(0, larg);
+				var vitesse = aleatoire(vitesseMin, vitesseMax);
+				var l = aleatoire(longMin, longMax);
+				var h = aleatoire(hautMin, hautMax);
+				var y = 0 - h;
+				
+				rec.push(new Rectangle(l, h, x, y, vitesse));
+		  
+		  }
+		  
+		  nbRec += 3; 
+	  }
+		
+	function aleatoire(min, max) { 
+		return (Math.floor((max-min)*Math.random())+min); 
+		} 
+
+	  
+	  function drawRectangle(myRectangle, context, couleur) {
+        context.beginPath();
+        context.rect(myRectangle.x, myRectangle.y, myRectangle.largeur, myRectangle.hauteur);
+        context.fillStyle = couleur;
+        context.fill();
+      }
+	  
+	   window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+      })();
+	
+	genRect();
+	animate(canvas, context);
+	score();
+    </script>
+  </body>
+</html> 
