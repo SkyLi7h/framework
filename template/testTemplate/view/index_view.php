@@ -1,8 +1,10 @@
 <?php
 
-	$test = new indexBusiness();	
+	$business = new index();	
 	if($DEBUG)
-		$debug->show("Lancement de la view $view avec en business $business");
+		$debug->show("Lancement de la view $viewClass avec en business $businessClass");	
+	
+	$business->test();
 
 ?>
 

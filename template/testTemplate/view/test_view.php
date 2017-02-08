@@ -1,9 +1,7 @@
-<?php
-
-	$test = new testBusiness();	
+<?php	
 	if($DEBUG)
-		$debug->show("Lancement de la view $view avec en business $business");
+		$debug->show("Lancement de la view $viewClass avec en business $businessClass");
 
 ?>
 
-<a href='../project/index.php'>test</a>
+<a href='../project/index.php?mod=index'>index</a>
